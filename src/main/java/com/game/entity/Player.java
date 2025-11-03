@@ -2,22 +2,49 @@ package com.game.entity;
 
 import java.util.Date;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.NamedQuery;
+import jakarta.persistence.Table;
 
+
+//2. Place all necessary annotations in the entity class to map it to a database table named "player".
+@Entity
+@Table(name = "player", schema = "rpg")
+@NamedQuery(name = "player_getAllCount", query = "SELECT COUNT(p) FROM Player p")
 public class Player {
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(nullable = false)
     private Long id;
 
+	@Column(nullable = false, length = 12)
     private String name;
 
+	@Column(nullable = false, length = 30)
     private String title;
 
+	@Column(nullable = false)
+	@Enumerated(EnumType.ORDINAL)
     private Race race;
 
+	@Column(nullable = false)
+	@Enumerated(EnumType.ORDINAL)
     private Profession profession;
 
+	@Column(nullable = false)
     private Date birthday;
 
+	@Column(nullable = false)
     private Boolean banned;
 
+	@Column(nullable = false)
     private Integer level;
 
     public Player() {

@@ -44,7 +44,7 @@ public class PlayerController {
 
     @PostMapping
     public ResponseEntity<PlayerInfo> createPlayer(@RequestBody PlayerInfo info) {
-        if (StringUtils.isEmpty(info.name) || info.name.length() > 12) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        if (!StringUtils.hasLength(info.name) || info.name.length() > 12) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         if (info.title.length() > 30) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         if (isNull(info.race)) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         if (isNull(info.profession)) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
@@ -64,7 +64,7 @@ public class PlayerController {
     public ResponseEntity<PlayerInfo> updatePlayer(@PathVariable("ID") long id,
                                                    @RequestBody PlayerInfo info) {
         if (id <= 0) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        if (nonNull(info.name) && (info.name.length() > 12 || info.name.isEmpty())) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        if (nonNull(info.name) && (!StringUtils.hasLength(info.name) || info.name.length() > 12)) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         if (nonNull(info.title) && info.title.length() > 30) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
 
         Player player = playerService.updatePlayer(id, info.name, info.title, info.race, info.profession, info.banned);
@@ -76,14 +76,14 @@ public class PlayerController {
     }
 
     @DeleteMapping("/{ID}")
-    public ResponseEntity delete(@PathVariable("ID") long id) {
-        if (id <= 0) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+    public ResponseEntity<Void> delete(@PathVariable("ID") long id) {
+        if (id <= 0) return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 
         Player player = playerService.delete(id);
         if (isNull(player)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } else {
-            return ResponseEntity.status(HttpStatus.OK).body(null);
+            return ResponseEntity.ok().build();
         }
     }
 

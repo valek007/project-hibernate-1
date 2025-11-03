@@ -1,4 +1,52 @@
-.idea
-/target
+# IDEs
+/.idea/
 *.iml
-/lib
+.classpath
+.project
+.settings/
+
+# Maven
+/target/
+
+# Eclipse / IntelliJ output
+/bin/
+/out/
+
+# Tomcat workspace/server config (do not commit local server configs)
+/Servers/
+
+# Logs, temp
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+
+# Compiled Java
+*.class
+
+# Archives and build artifacts
+*.jar
+*.war
+*.ear
+
+# Keys and secrets
+*.keystore
+*.jks
+.env
+
+# Node
+node_modules/
+
+# OS generated files
+ehthumbs.db
+Icon?
+
+# Other unwanted
+*.swp
+*~
+
+# Keep project source and assets (do not ignore):
+# src/, resources/, webapp/, css/, img/ should remain tracked
+
+# If you need to force-keep any ignored file, use an explicit negation. Example:
+# !/target/some-important-file

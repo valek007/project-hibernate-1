@@ -19,6 +19,7 @@ import static java.util.Objects.nonNull;
 public class PlayerService {
     private final IPlayerRepository playerRepository;
 
+    //Change to @Qualifier("db") to use database repository or remove it to use in-memory repository
     public PlayerService(@Qualifier("db") @Autowired IPlayerRepository playerRepository) {
         this.playerRepository = playerRepository;
     }
@@ -52,11 +53,11 @@ public class PlayerService {
 
         boolean needUpdate = false;
 
-        if (!StringUtils.isEmpty(name) && name.length() <= 12) {
+        if (StringUtils.hasLength(name) && name.length() <= 12) {
             player.setName(name);
             needUpdate = true;
         }
-        if (!StringUtils.isEmpty(title) && title.length() <= 30) {
+        if (StringUtils.hasLength(title) && title.length() <= 30) {
             player.setTitle(title);
             needUpdate = true;
         }

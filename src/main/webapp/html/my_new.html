@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="utf-8">
     <title>RPG</title>
-    <script src=https://code.jquery.com/jquery-3.6.0.min.js></script>
-    <link href="../css/my.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link th:href="@{/css/my.css}" href="../css/my.css" rel="stylesheet">
 </head>
 <body onload="showList(0)">
 <div class="container">
@@ -97,8 +98,8 @@
         </div>
         <div class="create__group">
             <span>
-                <button type="submit" onclick='createAcc()'>
-                    <img src="../img/save.png" alt="">
+                <button type="button" class="btn-primary" onclick='createAcc()'>
+                    <img th:src="@{/img/save.png}" src="../img/save.png" alt="" class="img_save">
                 </button>
             </span>
         </div>
@@ -106,9 +107,17 @@
 
 </div>
 
+<!-- Thymeleaf will replace these with context-aware paths -->
+<script th:inline="javascript">
+    var REST_PLAYERS = /*[[ @{/rest/players} ]]*/ '../rest/players';
+    var REST_PLAYERS_COUNT = /*[[ @{/rest/players/count} ]]*/ '../rest/players/count';
+    var IMG_PATH = /*[[ @{/img/} ]]*/ '../img/';
+/*<![CDATA[*/
+</script>
+
 <script>
     function showList(page_number) {
-        let url = "../rest/players?";
+        let url = REST_PLAYERS + "?";
         let countPerPage = $("#count_1").val() || 3;
         url = url + "pageSize=" + countPerPage;
         if (page_number !== null) url += "&pageNumber=" + page_number;
@@ -125,8 +134,8 @@
                     "<td>" + item.level + "</td>" +
                     "<td>" + new Date(item.birthday).toLocaleDateString() + "</td>" +
                     "<td>" + item.banned + "</td>" +
-                    "<td><button id='button_edit_" + item.id + "' onclick='editAcc(" + item.id + ")'><img src='../img/edit.png' class='img_edit'></button></td>" +
-                    "<td><button id='button_delete_" + item.id + "' onclick='deleteAcc(" + item.id + ")'><img src='../img/delete.png' class='img_delete'></button></td>"
+                    "<td><button id='button_edit_" + item.id + "' onclick='editAcc(" + item.id + ")'><img src='" + IMG_PATH + "edit.png' class='img_edit'></button></td>" +
+                    "<td><button id='button_delete_" + item.id + "' onclick='deleteAcc(" + item.id + ")'><img src='" + IMG_PATH + "delete.png' class='img_delete'></button></td>"
                 ).appendTo('#table_body');
             });
         }).fail(function(){});
@@ -146,19 +155,18 @@
 
     function getTotalCount() {
         let value = 1;
-        $.ajax({ url: "../rest/players/count", async: false, success: function (result) { value = result; } });
+        $.ajax({ url: REST_PLAYERS_COUNT, async: false, success: function (result) { value = result; } });
         return parseInt(value);
     }
 
     function deleteAcc(id) {
-        let url = "../rest/players/" + id;
-        $.ajax({ url: url, type: 'DELETE', success: function () { showList(getCurrentPage()); } });
+        $.ajax({ url: REST_PLAYERS + "/" + id, type: 'DELETE', success: function () { showList(getCurrentPage()); } });
     }
 
     function editAcc(id) {
         let btnEdit = "#button_edit_" + id, btnDel = "#button_delete_" + id;
         $(btnDel).remove();
-        $(btnEdit).html("<img src='../img/save.png' class='img_save'>").attr('onclick', 'saveAcc(' + id + ')');
+        $(btnEdit).html("<img src='" + IMG_PATH + "save.png' class='img_save'>").attr('onclick', 'saveAcc(' + id + ')');
         let tr = $(btnEdit).closest('tr'), tds = tr.children();
         tds.eq(1).html("<input id='input_name_" + id + "' type='text' value='" + tds.eq(1).text() + "'>");
         tds.eq(2).html("<input id='input_title_" + id + "' type='text' value='" + tds.eq(2).text() + "'>");
@@ -169,14 +177,13 @@
 
     function saveAcc(id) {
         let payload = { name: $("#input_name_"+id).val(), title: $("#input_title_"+id).val(), race: $("#select_race_"+id).val(), profession: $("#select_profession_"+id).val(), banned: $("#select_banned_"+id).val() };
-        let url = "../rest/players/" + id;
-        $.ajax({ url: url, type: 'POST', dataType: 'json', contentType: 'application/json;charset=UTF-8', async: false, data: JSON.stringify(payload), success: function () { showList(getCurrentPage()); } });
+        $.ajax({ url: REST_PLAYERS + "/" + id, type: 'POST', dataType: 'json', contentType: 'application/json;charset=UTF-8', async: false, data: JSON.stringify(payload), success: function () { showList(getCurrentPage()); } });
     }
 
     function createAcc() {
         let datetime = new Date($("#input_birthday_new").val()).getTime();
         let payload = { name: $("#input_name_new").val(), title: $("#input_title_new").val(), race: $("#input_race_new").val(), profession: $("#input_profession_new").val(), level: $("#input_level_new").val(), birthday: datetime, banned: $("#input_banned_new").val() };
-        let url = "../rest/players";
+        let url = REST_PLAYERS;
         $.ajax({ url: url, type: 'POST', dataType: 'json', contentType: 'application/json;charset=UTF-8', async: false, data: JSON.stringify(payload), success: function () { $("#input_name_new,#input_title_new,#input_level_new,#input_birthday_new").val(""); showList(getCurrentPage()); } });
         return false;
     }
@@ -189,6 +196,8 @@
     function getDropdownRaceHtml(id) { return "<select id='select_race_" + id + "' name='race'><option value='HUMAN'>HUMAN</option><option value='DWARF'>DWARF</option><option value='ELF'>ELF</option><option value='GIANT'>GIANT</option><option value='ORC'>ORC</option><option value='TROLL'>TROLL</option><option value='HOBBIT'>HOBBIT</option></select>"; }
     function getDropdownProfessionHtml(id) { return "<select id='select_profession_" + id + "' name='profession'><option value='WARRIOR'>WARRIOR</option><option value='ROGUE'>ROGUE</option><option value='SORCERER'>SORCERER</option><option value='CLERIC'>CLERIC</option><option value='PALADIN'>PALADIN</option><option value='NAZGUL'>NAZGUL</option><option value='WARLOCK'>WARLOCK</option><option value='DRUID'>DRUID</option></select>"; }
     function getDropdownBannedHtml(id) { return "<select id='select_banned_" + id + "' name='banned'><option value='false'>false</option><option value='true'>true</option></select>"; }
+
+/*]]>*/
 </script>
 </body>
 </html>
